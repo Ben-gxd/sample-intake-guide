@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>검체/동의서 등록 프로세스</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-jp.min.css');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ── 라이트 토큰 ─────────────────────────────── */
+:root,[data-theme="light"]{
+  --teal:#43b3ae;--teal-dark:#1a6b68;--teal-dim:#2a8c87;
+  --teal-pale:#f0fafa;--teal-light:#d4efee;--teal-mid:#7ecfcb;
+  --green:#0d9e6e;--green-bg:#f0faf6;
+  --red:#e03131;--red-bg:#fff5f5;
+  --amber:#c47b00;--amber-bg:#fffbf0;
+  --g50:#f8f9fa;--g100:#f1f3f5;--g200:#e9ecef;--g300:#dee2e6;
+  --g400:#ced4da;--g500:#adb5bd;--g600:#868e96;
+  --g700:#495057;--g800:#343a40;--g900:#212529;
+  --bg-page:#f8f9fb;
+  --bg-sidebar:#ffffff;--bg-card:#ffffff;
+  --border:#e9ecef;--border-subtle:#f1f3f5;
+  --shadow:0 8px 24px rgba(0,0,0,.08);
+  --th-bg:#343a40;--th-text:#ffffff;
+  --code-bg:#f1f3f5;--code-text:#c0392b;
+  --search-bg:#f8f9fa;--search-focus:#ffffff;
+  --banner-plain:#343a40;
+}
+
+/* ── 다크 토큰 ───────────────────────────────── */
+[data-theme="dark"]{
+  --teal:#43b3ae;--teal-dark:#7ecfcb;--teal-dim:#5cc4bf;
+  --teal-pale:#0d2827;--teal-light:#143d3b;--teal-mid:#3a9995;
+  --green:#3ecf8e;--green-bg:#0a2e1f;
+  --red:#ff6b6b;--red-bg:#2e0f0f;
+  --amber:#fcc419;--amber-bg:#2b2000;
+  --g50:#1a1b1e;--g100:#25262b;--g200:#2c2e33;--g300:#373a40;
+  --g400:#495057;--g500:#868e96;--g600:#adb5bd;
+  --g700:#ced4da;--g800:#dee2e6;--g900:#f1f3f5;
+  --bg-page:#141517;
+  --bg-sidebar:#1a1b1e;--bg-card:#1e2023;
+  --border:#2c2e33;--border-subtle:#25262b;
+  --shadow:0 8px 24px rgba(0,0,0,.4);
+  --th-bg:#25262b;--th-text:#dee2e6;
+  --code-bg:#25262b;--code-text:#f08c8c;
+  --search-bg:#25262b;--search-focus:#2c2e33;
+  --banner-plain:#25262b;
+}
+
+html{scroll-behavior:smooth}
+body{font-family:'Pretendard JP Variable','Pretendard JP','Noto Sans KR',sans-serif;letter-spacing:-0.02em;font-size:16px;color:var(--g900);background:var(--bg-page);display:flex;min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--g300);border-radius:99px}
+
+/* SIDEBAR */
+#sb{width:260px;min-width:260px;background:var(--bg-sidebar);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;display:flex;flex-direction:column;transition:background .2s,border-color .2s}
+#sb-hd{padding:22px 18px 14px;border-bottom:1px solid var(--border-subtle)}
+.logo{width:30px;height:30px;background:var(--teal);border-radius:7px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.logo svg{width:16px;height:16px}
+#sb-hd h1{font-size:13px;font-weight:700;color:var(--g900);line-height:1.5;letter-spacing:-0.02em}
+#sb-hd p{font-size:11px;color:var(--g500);margin-top:2px}
+
+/* 다크모드 토글 버튼 */
+#theme-btn{
+  display:flex;align-items:center;gap:7px;
+  margin:10px 18px 0;
+  padding:7px 12px;
+  border:1px solid var(--border);
+  border-radius:20px;
+  background:var(--g50);
+  color:var(--g600);
+  font-size:12px;font-family:inherit;font-weight:600;letter-spacing:-0.02em;
+  cursor:pointer;transition:all .15s;
+  width:calc(100% - 36px);justify-content:center;
+}
+#theme-btn:hover{border-color:var(--teal);color:var(--teal-dark);background:var(--teal-pale)}
+#theme-btn .icon{font-size:14px;line-height:1}
+
+#sw{padding:10px 14px;border-bottom:1px solid var(--border-subtle);position:relative}
+#si{width:100%;padding:8px 12px 8px 32px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;letter-spacing:-0.02em;outline:none;background:var(--search-bg);color:var(--g900);transition:border-color .15s,background .15s}
+#si:focus{border-color:var(--teal);background:var(--search-focus)}
+#si::placeholder{color:var(--g500)}
+.si-ico{position:absolute;left:22px;top:50%;transform:translateY(-50%);color:var(--g400);pointer-events:none;display:flex;align-items:center}
+#sr{display:none;position:absolute;left:14px;right:14px;top:calc(100% - 4px);background:var(--bg-card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);z-index:200;max-height:300px;overflow-y:auto;padding:6px}
+.sri{padding:8px 10px;border-radius:6px;cursor:pointer;transition:background .1s}
+.sri:hover{background:var(--teal-pale)}
+.sri-t{font-size:12px;font-weight:600;color:var(--teal-dark)}
+.sri-c{font-size:11px;color:var(--g500);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sri mark{background:#fff3b0;padding:0 1px;border-radius:2px;font-style:normal}
+[data-theme="dark"] .sri mark{background:#5c4a00;color:#fcc419}
+.sr-emp{padding:14px;font-size:12px;color:var(--g500);text-align:center}
+nav{flex:1;padding:8px 0 24px}
+.nl{padding:13px 18px 4px;font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.06em}
+.ni{display:flex;align-items:center;gap:7px;padding:6px 18px;font-size:12.5px;color:var(--g700);cursor:pointer;border-left:2px solid transparent;transition:all .12s;line-height:1.4;letter-spacing:-0.02em}
+.ni:hover{background:var(--g50);color:var(--teal-dark)}
+.ni.active{background:var(--teal-pale);color:var(--teal-dark);border-left-color:var(--teal);font-weight:600}
+.ni.sub{padding-left:32px;font-size:12px;color:var(--g500)}
+.ni.sub:hover{color:var(--teal-dim)}
+.ni.sub.active{color:var(--teal-dark);border-left-color:var(--teal)}
+.sd{width:18px;height:18px;min-width:18px;background:var(--teal);color:#fff;border-radius:5px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;letter-spacing:0}
+.ni.sub .sd{background:var(--g300);font-size:8px;width:14px;height:14px;min-width:14px;border-radius:3px}
+
+/* MAIN */
+#main{margin-left:260px;flex:1;padding:40px 48px 100px;max-width:calc(260px + 800px)}
+#ph{margin-bottom:36px}
+.eyebrow{font-size:11px;font-weight:600;color:var(--teal-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+#ph h1{font-size:30px;font-weight:800;color:var(--g900);letter-spacing:-.03em;line-height:1.2;margin-bottom:8px}
+#ph p{font-size:14px;color:var(--g500)}
+.hdiv{height:1px;background:var(--border);margin-top:20px}
+
+/* SECTION */
+.sec{margin-bottom:48px;scroll-margin-top:28px}
+.banner{display:flex;align-items:center;gap:14px;padding:18px 24px;background:var(--teal);border-radius:14px 14px 0 0}
+.banner.plain{background:var(--banner-plain)}
+.bsnum{background:rgba(255,255,255,.18);border-radius:7px;padding:5px 10px;display:flex;flex-direction:column;align-items:center;min-width:48px}
+.bsnum .bl{font-size:9px;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:.04em}
+.bsnum .bn{font-size:23px;font-weight:800;color:#fff;line-height:1}
+.banner h2{font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.02em}
+.banner.plain h2{font-size:17px}
+.sbody{background:var(--bg-card);border:1px solid var(--border);border-top:none;border-radius:0 0 14px 14px;padding:28px 28px 24px;transition:background .2s,border-color .2s}
+.sbody h3{font-size:15.5px;font-weight:700;color:var(--g800);margin:28px 0 10px;padding-bottom:8px;border-bottom:1.5px solid var(--border-subtle);letter-spacing:-0.02em}
+.sbody h3:first-child{margin-top:0}
+p.desc{font-size:15.5px;line-height:1.85;color:var(--g700);margin-bottom:12px}
+
+/* STEP CARDS */
+.stov{display:flex;flex-direction:column;gap:7px;margin-top:14px}
+.stc{display:flex;align-items:stretch;border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow .15s,border-color .15s;background:var(--bg-card)}
+.stc:hover{border-color:var(--teal-mid);box-shadow:0 2px 12px rgba(67,179,174,.12)}
+.scn{background:var(--teal);min-width:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 6px;gap:1px}
+.scn .sl{font-size:8px;font-weight:700;color:rgba(255,255,255,.65);letter-spacing:.06em}
+.scn .sn{font-size:24px;font-weight:800;color:#fff;line-height:1}
+.scb{flex:1;padding:14px 18px;background:var(--teal-pale)}
+.sc-title{font-size:15px;font-weight:700;color:var(--teal-dark);margin-bottom:3px;letter-spacing:-0.02em}
+.sc-desc{font-size:14px;color:var(--g500);line-height:1.5}
+.sca{display:flex;align-items:center;padding:0 16px;background:var(--teal-pale);color:var(--teal-mid);font-size:18px}
+
+/* CONCEPTS */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.ccard{background:var(--g50);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.ct{font-size:13.5px;font-weight:700;color:var(--teal-dark);margin-bottom:5px;letter-spacing:-0.02em}
+.cd{font-size:14.5px;color:var(--g700);line-height:1.6}
+
+/* CALLOUT */
+.callout{display:flex;border-radius:10px;overflow:hidden;margin:10px 0;border:1px solid transparent}
+.cl-lc{display:flex;align-items:flex-start;padding:12px 10px 12px 14px}
+.cl-badge{font-size:13px;font-weight:700;padding:4px 10px;border-radius:5px;white-space:nowrap;letter-spacing:.01em}
+.cl-body{flex:1;padding:12px 16px 12px 4px;font-size:15px;line-height:1.85;color:var(--g700)}
+.cl-body strong{font-weight:700}
+.cl-body ul{list-style:none;padding:0;margin-top:5px}
+.cl-body ul li{padding:3px 0 3px 14px;position:relative}
+.cl-body ul li::before{content:"·";position:absolute;left:4px}
+.c-green{background:var(--green-bg);border-color:#b2dfce}.c-green .cl-badge{background:#d4f0e5;color:var(--green)}
+.c-red{background:var(--red-bg);border-color:#ffc9c9}.c-red .cl-badge{background:#ffe3e3;color:var(--red)}
+.c-amber{background:var(--amber-bg);border-color:#ffe08a}.c-amber .cl-badge{background:#fff3cd;color:var(--amber)}
+.c-teal{background:var(--teal-pale);border-color:var(--teal-light)}.c-teal .cl-badge{background:var(--teal-light);color:var(--teal-dark)}
+[data-theme="dark"] .c-green{border-color:#1a4a35}
+[data-theme="dark"] .c-red{border-color:#4a1515}
+[data-theme="dark"] .c-amber{border-color:#4a3500}
+[data-theme="dark"] .c-teal{border-color:var(--teal-light)}
+
+/* TABLE */
+.tw{overflow-x:auto;margin:10px 0;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+thead tr{background:var(--th-bg)}
+th{color:var(--th-text);padding:10px 14px;text-align:left;font-weight:600;font-size:13px;letter-spacing:.01em;white-space:nowrap}
+th:first-child{border-radius:10px 0 0 0}th:last-child{border-radius:0 10px 0 0}
+td{padding:12px 14px;border-bottom:1px solid var(--border-subtle);vertical-align:top;line-height:1.7;color:var(--g800)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--g50)}
+.td-k{color:var(--teal-dark);font-weight:600;white-space:nowrap;background:var(--teal-pale);font-size:13.5px}
+.td-kc{text-align:center;font-weight:700;color:var(--teal-dark);background:var(--teal-pale)}
+.td-note{color:var(--g500);font-size:13px}
+.td-warn{background:var(--red-bg);color:var(--red);font-weight:600}
+.td-warnb{background:var(--red-bg)}
+.ni-note{color:var(--g600);font-size:14px;display:block;margin-top:5px;line-height:1.6}
+.ni-hl{color:var(--teal-dark);font-weight:700;display:block;margin-top:5px;font-size:14px}
+.ni-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;background:var(--amber-bg);border:1px solid #ffe08a;border-radius:6px;color:var(--amber);font-weight:700;font-size:14px;margin-top:10px}
+[data-theme="dark"] .ni-badge{border-color:#4a3500}
+code{background:var(--code-bg);padding:2px 6px;border-radius:4px;font-family:'SF Mono',Menlo,monospace;font-size:12px;color:var(--code-text);letter-spacing:0}
+.blist{list-style:none;padding:0;margin:8px 0}
+.blist li{padding:5px 0 5px 18px;position:relative;font-size:15px;color:var(--g700);line-height:1.7}
+.blist li::before{content:"•";position:absolute;left:2px;color:var(--teal)}
+.path-block{background:var(--g100);border-radius:6px;padding:8px 14px;font-size:14px;color:var(--g700);margin:8px 0 12px;font-family:'SF Mono',Menlo,monospace;letter-spacing:0;border-left:3px solid var(--teal)}
+.mb-block{display:flex;flex-direction:column;gap:10px}
+.mb-label{font-size:13.5px;font-weight:700;margin-bottom:5px}
+</style>
+</head>
+<body>
+<div id="sb">
+  <div id="sb-hd">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+    </div>
+    <h1>검체/동의서 등록<br>프로세스</h1>
+    <p>한컴 기준 · 개발팀 참고용</p>
+    <button id="theme-btn" onclick="toggleTheme()">
+      <span class="icon" id="theme-icon">🌙</span>
+      <span id="theme-label">다크 모드</span>
+    </button>
+  </div>
+  <div id="sw">
+    <span class="si-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+    <input type="text" id="si" placeholder="내용 검색..." autocomplete="off">
+    <div id="sr"></div>
+  </div>
+  <nav id="nav"></nav>
+</div>
+
+<div id="main">
+  <div id="ph">
+    <div class="eyebrow">Internal Guide · 한컴 기준</div>
+    <h1>검체/동의서 등록 프로세스</h1>
+    <p>개발팀 참고용 내부 문서 — 검체와 동의서 입고부터 BO 등록까지 전 과정을 다룹니다.</p>
+    <div class="hdiv"></div>
+  </div>
+  <div id="content"></div>
+</div>
+
+<script src="content.js"></script>
+<script>
+// ── 다크모드 ────────────────────────────────────────────────
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-icon').textContent = theme === 'dark' ? '☀️' : '🌙';
+  document.getElementById('theme-label').textContent = theme === 'dark' ? '라이트 모드' : '다크 모드';
+  localStorage.setItem('theme', theme);
+}
+
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  applyTheme(cur === 'dark' ? 'light' : 'dark');
+}
+
+// 초기 테마: 저장값 → 시스템 설정 → 라이트
+(function initTheme() {
+  const saved = localStorage.getItem('theme');
+  if (saved) { applyTheme(saved); return; }
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(prefersDark ? 'dark' : 'light');
+})();
+
+// 시스템 테마 변경 감지 (직접 토글한 적 없을 때만 따라감)
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (!localStorage.getItem('theme')) applyTheme(e.matches ? 'dark' : 'light');
+});
+
+// ── 렌더러 ───────────────────────────────────────────────────
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+function renderCell(v) {
+  if (typeof v === 'string') return esc(v);
+  let h = esc(v.text||'');
+  if (v.hl)    h += `<span class="ni-hl">${esc(v.hl)}</span>`;
+  if (v.note)  h += `<span class="ni-note">${v.note.replace(/\n/g,'<br>')}</span>`;
+  if (v.badge) h += `<span class="ni-badge">⚠ ${esc(v.badge)}</span>`;
+  if (v.items) h += `<ul class="blist">${v.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul>`;
+  if (v.multiblock) {
+    h += `<div class="mb-block">`;
+    v.multiblock.forEach(b => {
+      const lc = b.labelColor === 'teal' ? 'var(--teal-dark)' : 'var(--g600)';
+      h += `<div><div class="mb-label" style="color:${lc}">${esc(b.label)}</div>`;
+      h += `<ul class="blist">${b.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`;
+    });
+    h += `</div>`;
+  }
+  return h;
+}
+
+function renderBlock(b) {
+  if (b.type === 'steps') {
+    const steps = SECTIONS.filter(s => s.step);
+    return `<div class="stov">${steps.map(s=>`
+      <div class="stc" onclick="goTo('${s.id}')">
+        <div class="scn"><span class="sl">STEP</span><span class="sn">${s.step}</span></div>
+        <div class="scb"><div class="sc-title">${esc(s.title)}</div><div class="sc-desc">${esc(s.content.find(c=>c.type==='p')?.text||'')}</div></div>
+        <div class="sca">›</div>
+      </div>`).join('')}</div>`;
+  }
+  if (b.type === 'concepts') {
+    return `<div class="cgrid">${b.items.map(i=>`<div class="ccard"><div class="ct">${esc(i.term)}</div><div class="cd">${esc(i.def)}</div></div>`).join('')}</div>`;
+  }
+  if (b.type === 'p') return `<p class="desc">${esc(b.text)}</p>`;
+  if (b.type === 'subhead') return `<h3 id="${b.id}">${esc(b.text)}</h3>`;
+  if (b.type === 'pathblock') return `<div class="path-block">${esc(b.text)}</div>`;
+  if (b.type === 'blist') return `<ul class="blist">${b.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul>`;
+  if (b.type === 'callout') {
+    const lines = b.lines.map(l=>`<li>${l}</li>`).join('');
+    return `<div class="callout c-${b.color}"><div class="cl-lc"><span class="cl-badge">${esc(b.label)}</span></div><div class="cl-body"><ul>${lines}</ul></div></div>`;
+  }
+  if (b.type === 'table') {
+    const cw = b.colwidths || [];
+    const ths = b.heads.map((h,i)=>`<th${cw[i]?` style="width:${cw[i]}"`:``}>${esc(h)}</th>`).join('');
+    const trs = b.rows.map(row => {
+      const tds = row.map((v,ci) => {
+        const isFirst = ci === 0;
+        const warn = typeof v === 'object' && v.warn;
+        const cls = warn ? (isFirst ? 'td-warn' : 'td-warnb') : (isFirst ? (b.heads[0]==='열'||b.heads[0]==='순서'||b.heads[0]==='단계' ? 'td-kc' : 'td-k') : '');
+        return `<td class="${cls}">${renderCell(v)}</td>`;
+      }).join('');
+      return `<tr>${tds}</tr>`;
+    }).join('');
+    return `<div class="tw"><table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></div>`;
+  }
+  return '';
+}
+
+function renderSection(s) {
+  const bannerClass = s.banner === 'plain' ? 'banner plain' : 'banner';
+  const stepBadge = s.step ? `<div class="bsnum"><span class="bl">STEP</span><span class="bn">${s.step}</span></div>` : '';
+  const body = s.content.map(renderBlock).join('');
+  return `<div class="sec" id="${s.id}">
+    <div class="${bannerClass}">${stepBadge}<h2>${esc(s.title)}</h2></div>
+    <div class="sbody">${body}</div>
+  </div>`;
+}
+
+// ── 사이드바 ─────────────────────────────────────────────────
+function buildNav() {
+  const nav = document.getElementById('nav');
+  let html = '<div class="nl">개요</div>';
+  SECTIONS.filter(s => !s.step).forEach(s => {
+    html += `<div class="ni" data-t="${s.id}">${esc(s.title)}</div>`;
+  });
+  html += '<div class="nl">세부 단계</div>';
+  SECTIONS.filter(s => s.step).forEach(s => {
+    html += `<div class="ni" data-t="${s.id}"><span class="sd">${s.step}</span>${esc(s.title)}</div>`;
+    (s.subsections||[]).forEach(sub => {
+      html += `<div class="ni sub" data-t="${sub.id}"><span class="sd"></span>${esc(sub.title)}</div>`;
+    });
+  });
+  nav.innerHTML = html;
+  nav.querySelectorAll('.ni[data-t]').forEach(el => {
+    el.addEventListener('click', () => goTo(el.dataset.t));
+  });
+}
+
+// ── 검색 ──────────────────────────────────────────────────────
+const searchIndex = [];
+function buildSearchIndex() {
+  SECTIONS.forEach(s => {
+    searchIndex.push({ id: s.id, title: s.title });
+    (s.subsections||[]).forEach(sub => {
+      searchIndex.push({ id: sub.id, title: `${s.title} › ${sub.title}` });
+    });
+  });
+}
+const si = document.getElementById('si');
+const sr = document.getElementById('sr');
+function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') }
+function hlText(t,q){ return t.replace(new RegExp(`(${escRe(q)})`,'gi'),'<mark>$1</mark>') }
+si.addEventListener('input', () => {
+  const q = si.value.trim();
+  if (q.length < 2) { sr.style.display='none'; return; }
+  const hits = searchIndex.map(item => {
+    const el = document.getElementById(item.id);
+    const txt = el ? el.innerText : '';
+    const idx = txt.toLowerCase().indexOf(q.toLowerCase());
+    if (idx === -1 && !item.title.toLowerCase().includes(q.toLowerCase())) return null;
+    const ctx = idx >= 0 ? txt.substring(Math.max(0,idx-15), idx+60).replace(/\n/g,' ') : '';
+    return { ...item, ctx };
+  }).filter(Boolean).slice(0, 8);
+  sr.innerHTML = hits.length
+    ? hits.map(r=>`<div class="sri" onclick="goTo('${r.id}');sr.style.display='none';si.value=''"><div class="sri-t">${hlText(r.title,q)}</div>${r.ctx?`<div class="sri-c">...${hlText(r.ctx,q)}...</div>`:''}</div>`).join('')
+    : '<div class="sr-emp">검색 결과가 없습니다.</div>';
+  sr.style.display = 'block';
+});
+document.addEventListener('click', e => { if (!document.getElementById('sw').contains(e.target)) sr.style.display='none'; });
+si.addEventListener('keydown', e => { if (e.key==='Escape'){sr.style.display='none';si.value='';} });
+
+// ── 스크롤 ────────────────────────────────────────────────────
+function goTo(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+const allIds = [];
+SECTIONS.forEach(s => {
+  allIds.push(s.id);
+  (s.subsections||[]).forEach(sub => allIds.push(sub.id));
+});
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+      const m = document.querySelector(`.ni[data-t="${e.target.id}"]`);
+      if (m) m.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px' });
+
+// ── 초기화 ────────────────────────────────────────────────────
+document.getElementById('content').innerHTML = SECTIONS.map(renderSection).join('');
+buildNav();
+buildSearchIndex();
+allIds.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
+</script>
+</body>
+</html>
