@@ -55,7 +55,7 @@ const SECTIONS = [
       { id: 'step1-mask',   title: '개인정보 마스킹' },
     ],
     content: [
-      { type: 'p', text: '병원 정보지 vs 검체 vs 동의서의 정보가 일치하는지 전수 대조하고, 확인 후 검체와 동의서 2개에 인증키(라벨)를 부착합니다.' },
+      { type: 'p', text: '병원 정보지, 검체, 동의서의 정보가 일치하는지 전수 대조하고, 확인 후 검체와 동의서 2개에 인증키(라벨)를 부착합니다.' },
 
       { type: 'subhead', id: 'step1-match', text: '동의서 수신 형태' },
       { type: 'table',
